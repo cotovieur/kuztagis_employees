@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Специальности и Профессии{% endblock %}
+
+{% block content %}
+<h1>Список специальностей и профессий</h1>
+<ul>
+    {% for item in items %}
+    <li>{{ item[1] }} ({{ "Специальность" if item[2] else "Профессия" }})</li>
+    {% endfor %}
+</ul>
+{% endblock %}

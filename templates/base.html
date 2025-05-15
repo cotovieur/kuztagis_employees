@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        nav {
+            background-color: #f8f8f8;
+            padding: 10px;
+        }
+        nav a {
+            margin-right: 15px;
+        }
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('workers') }}">Преподаватели</a>
+        <a href="{{ url_for('items') }}">Специальности и Профессии</a>
+        <a href="{{ url_for('assign') }}">Назначить преподавателей</a>
+    </nav>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

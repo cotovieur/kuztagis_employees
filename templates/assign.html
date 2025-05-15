@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Назначить преподавателей{% endblock %}
+
+{% block content %}
+<h1>Назначить преподавателей</h1>
+<div style="display: flex;">
+    <div style="width: 50%; padding: 20px; background-color: #f0f8ff;">
+        <h2>Специальности и Профессии</h2>
+        {% for item in items %}
+        <div class="item {% if item[2] %}specialty{% else %}profession{% endif %}" data-id="{{ item[0] }}">
+            {{ item[1] }} ({{ item[3] }})
+        </div>
+        {% endfor %}
+    </div>
+    <div style="width: 50%; padding: 20px; background-color: #e6ffe6;">
+        <h2>Преподаватели</h2>
+        {% for worker in workers %}
+        <div class="worker" draggable="true" data-id="{{ worker[0] }}">
+            {{ worker[1] }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const workers = document.querySelectorAll('.worker');
+        const items = document.querySelectorAll('.item');
+
+        workers.forEach(worker => {
+            worker.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', worker.dataset.id);
+            });
+        });
+
+        items.forEach(item => {
+            item.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+
+            item.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const workerId = e.dataTransfer.getData('text/plain');
+                const itemId = item.dataset.id;
+
+                fetch('/add_worker_to_item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ worker_id: workerId, item_id: itemId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Преподаватель добавлен');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

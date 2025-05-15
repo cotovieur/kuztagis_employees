@@ -1,45 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Список работников</title>
-</head>
-<body>
-    <h1>Список работников</h1>
-    <a href="{{ url_for('add_worker') }}">Добавить нового работника</a>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ФИО</th>
-                <th>Должность</th>
-                <th>Уровень образования</th>
-                <th>Специальность</th>
-                <th>Квалификация</th>
-                <th>Ученая степень</th>
-                <th>Ученое звание</th>
-                <th>Повышение квалификации</th>
-                <th>Общий стаж работы</th>
-                <th>Стаж работы по специальности</th>
-                <th>Курсы</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for worker in workers %}
-            <tr>
-                <td>{{ worker[1] }}</td>
-                <td>{{ worker[2] }}</td>
-                <td>{{ worker[3] }}</td>
-                <td>{{ worker[4] }}</td>
-                <td>{{ worker[5] }}</td>
-                <td>{{ worker[6] }}</td>
-                <td>{{ worker[7] }}</td>
-                <td>{{ worker[8] }}</td>
-                <td>{{ worker[9] }}</td>
-                <td>{{ worker[10] }}</td>
-                <td>{{ worker[11] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<h1>Добро пожаловать</h1>
+<p>Выберите один из пунктов меню для продолжения.</p>
+{% endblock %}
