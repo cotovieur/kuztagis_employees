@@ -134,23 +134,28 @@
         fireButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const workerId = this.dataset.workerId;
-                console.log('Firing worker with ID:', workerId);  // Debug print
 
-                fetch('/fire', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ worker_id: workerId }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Преподаватель удален');
-                        window.location.reload();  // Refresh the page
-                    }
-                })
-                .catch(error => console.error('Error:', error));  // Debug print
+                // Ask for confirmation before firing the worker
+                if (confirm('Вы уверены, что хотите уволить этого преподавателя?')) {
+                    fetch('/fire', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ worker_id: workerId }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert('Преподаватель уволен');
+                            window.location.reload();  // Refresh the page
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Произошла ошибка при увольнении преподавателя');
+                    });
+                }
             });
         });
 
