@@ -7,6 +7,7 @@
 <table>
     <thead>
         <tr>
+            <th>ИД</th>
             <th>ФИО</th>
             <th>Должность</th>
             <th>Уровень образования</th>
@@ -18,11 +19,13 @@
             <th>Общий стаж работы</th>
             <th>Стаж работы по специальности</th>
             <th>Курсы</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         {% for worker in workers %}
         <tr>
+            <td>{{ worker[0] }}</td>
             <td>{{ worker[1] }}</td>
             <td>{{ worker[2] }}</td>
             <td>{{ worker[3] }}</td>
@@ -34,8 +37,37 @@
             <td>{{ worker[9] }}</td>
             <td>{{ worker[10] }}</td>
             <td>{{ worker[11] }}</td>
+            <td><button class="fire-button" data-worker-id="{{ worker[0] }}">Уволить</button></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fireButtons = document.querySelectorAll('.fire-button');
+
+        fireButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const workerId = this.dataset.workerId;
+                console.log('Firing worker with ID:', workerId);  // Debug print
+
+                fetch('/fire', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ worker_id: workerId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Преподаватель удален');
+                        window.location.reload();  // Refresh the page
+                    }
+                })
+                .catch(error => console.error('Error:', error));  // Debug print
+            });
+        });
+    });
+</script>
 {% endblock %}

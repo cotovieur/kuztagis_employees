@@ -19,6 +19,18 @@ def inspect_database():
     for item in items:
         print(item)
 
+    # Fetch and print worker-item relationships with names and titles
+    print("\nWorker-Item Relationships:")
+    cursor.execute('''
+    SELECT w.fio, i.name
+    FROM worker_item wi
+    JOIN workers w ON wi.worker_id = w.worker_id
+    JOIN items i ON wi.item_id = i.item_id
+    ''')
+    worker_items = cursor.fetchall()
+    for worker_item in worker_items:
+        print(worker_item)
+
     conn.close()
 
 if __name__ == '__main__':

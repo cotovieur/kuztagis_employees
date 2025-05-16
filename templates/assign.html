@@ -9,7 +9,26 @@
         <h2>Специальности и Профессии</h2>
         {% for item in items %}
         <div class="item {% if item[2] %}specialty{% else %}profession{% endif %}" data-id="{{ item[0] }}">
-            {{ item[1] }} ({{ item[3] }})
+            {% if item[3] %}
+            <details open>
+                <summary>{{ item[1] }} ({{ item[3].split(',') | length }})</summary>
+                <div class="worker-list">
+                    {% for worker_fio in item[3].split(',') %}
+                        <div class="assigned-worker">
+                            {{ worker_fio }}
+                            <button class="unassign-button" data-worker-fio="{{ worker_fio }}" data-item-id="{{ item[0] }}">-</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </details>
+            {% else %}
+            <details>
+                <summary>{{ item[1] }} (0)</summary>
+                <div class="worker-list">
+                    <p>Нет назначенных преподавателей</p>
+                </div>
+            </details>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -26,6 +45,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const workers = document.querySelectorAll('.worker');
         const items = document.querySelectorAll('.item');
+        const unassignButtons = document.querySelectorAll('.unassign-button');
 
         workers.forEach(worker => {
             worker.addEventListener('dragstart', function(e) {
@@ -54,6 +74,33 @@
                 .then(data => {
                     if (data.status === 'success') {
                         alert('Преподаватель добавлен');
+                        window.location.reload();  // Refresh the page
+                    } else if (data.status === 'already_assigned') {
+                        alert('Преподаватель уже назначен');
+                    }
+                });
+            });
+        });
+
+        unassignButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const workerFio = this.dataset.workerFio;
+                const itemId = this.dataset.itemId;
+
+                fetch('/remove_worker_from_item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ worker_fio: workerFio, item_id: itemId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Преподаватель удален');
+                        window.location.reload();  // Refresh the page
+                    } else if (data.status === 'worker_not_found') {
+                        alert('Преподаватель не найден');
                     }
                 });
             });
