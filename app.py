@@ -3,6 +3,32 @@ import sqlite3
 
 app = Flask(__name__)
 
+# Checking if worker_id or fio is already recorded
+def check_worker_exists(conn, worker_id=None, fio=None, exclude_worker_id=None):
+    cursor = conn.cursor()
+
+    if worker_id is not None:
+        query = 'SELECT 1 FROM workers WHERE worker_id = ?'
+        params = (worker_id,)
+        if exclude_worker_id is not None:
+            query += ' AND worker_id != ?'
+            params += (exclude_worker_id,)
+        cursor.execute(query, params)
+        if cursor.fetchone():
+            return True, "Worker ID already exists"
+
+    if fio is not None:
+        query = 'SELECT 1 FROM workers WHERE fio = ?'
+        params = (fio,)
+        if exclude_worker_id is not None:
+            query += ' AND worker_id != ?'
+            params += (exclude_worker_id,)
+        cursor.execute(query, params)
+        if cursor.fetchone():
+            return True, "FIO already exists"
+
+    return False, None
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -32,7 +58,13 @@ def add_worker():
         total_experience = request.form['total_experience']
         specialty_experience = request.form['specialty_experience']
         courses = request.form['courses']
+
         conn = sqlite3.connect('workers.db')
+        exists, message = check_worker_exists(conn, worker_id=worker_id, fio=fio)
+        if exists:
+            conn.close()
+            return jsonify({'status': 'error', 'message': message}), 400
+
         cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO workers (
@@ -47,7 +79,8 @@ def add_worker():
         ))
         conn.commit()
         conn.close()
-        return redirect(url_for('index'))
+        return jsonify({'status': 'success'})
+
     return render_template('add_worker.html')
 
 # Firing worker
@@ -64,7 +97,82 @@ def fire_worker():
 
     # Delete the worker from the worker_item table
     cursor.execute('DELETE FROM worker_item WHERE worker_id = ?', (worker_id,))
-    
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'status': 'success'})
+
+@app.route('/get_worker')
+def get_worker():
+    worker_id = request.args.get('worker_id')
+    conn = sqlite3.connect('workers.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM workers WHERE worker_id = ?', (worker_id,))
+    worker = cursor.fetchone()
+    conn.close()
+
+    if worker:
+        return jsonify({
+            'worker_id': worker[0],
+            'fio': worker[1],
+            'position': worker[2],
+            'education_level': worker[3],
+            'specialty': worker[4],
+            'qualification': worker[5],
+            'academic_degree': worker[6],
+            'academic_title': worker[7],
+            'professional_retraining': worker[8],
+            'total_experience': worker[9],
+            'specialty_experience': worker[10],
+            'courses': worker[11]
+        })
+    else:
+        return jsonify({'status': 'error', 'message': 'Worker not found'}), 404
+
+@app.route('/edit_worker', methods=['POST'])
+def edit_worker():
+    old_worker_id = request.form['old_worker_id']
+    new_worker_id = request.form['worker_id']
+    fio = request.form['fio']
+    position = request.form['position']
+    education_level = request.form['education_level']
+    specialty = request.form['specialty']
+    qualification = request.form['qualification']
+    academic_degree = request.form['academic_degree']
+    academic_title = request.form['academic_title']
+    professional_retraining = request.form['professional_retraining']
+    total_experience = request.form['total_experience']
+    specialty_experience = request.form['specialty_experience']
+    courses = request.form['courses']
+
+    conn = sqlite3.connect('workers.db')
+    exists, message = check_worker_exists(conn, worker_id=new_worker_id, fio=fio, exclude_worker_id=old_worker_id)
+    if exists:
+        conn.close()
+        return jsonify({'status': 'error', 'message': message}), 400
+
+    cursor = conn.cursor()
+    cursor.execute('''
+    UPDATE workers SET
+        worker_id = ?,
+        fio = ?,
+        position = ?,
+        education_level = ?,
+        specialty = ?,
+        qualification = ?,
+        academic_degree = ?,
+        academic_title = ?,
+        professional_retraining = ?,
+        total_experience = ?,
+        specialty_experience = ?,
+        courses = ?
+    WHERE worker_id = ?
+    ''', (
+        new_worker_id, fio, position, education_level, specialty, qualification,
+        academic_degree, academic_title, professional_retraining,
+        total_experience, specialty_experience, courses, old_worker_id
+    ))
     conn.commit()
     conn.close()
 

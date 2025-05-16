@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Новый преподаватель</h1>
-    <form method="POST" action="{{ url_for('add_worker') }}">
+    <form id="addWorkerForm" method="POST" action="{{ url_for('add_worker') }}">
         <label for="aisepo_id">ИД из АИС ЭПО:</label>
         <input type="number" id="aisepo_id" name="aisepo_id" required><br><br>
 
@@ -43,4 +43,38 @@
 
         <button type="submit">Создать</button>
     </form>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addWorkerForm = document.getElementById('addWorkerForm');
+
+        addWorkerForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(addWorkerForm);
+            fetch('/add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Преподаватель добавлен');
+                    window.location.reload();  // Refresh the page
+                } else if (data.status === 'error') {
+                    alert(data.message);  // Display the error message
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка: ' + error.message);
+            });
+        });
+    });
+</script>
+
 {% endblock %}

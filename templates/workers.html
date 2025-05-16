@@ -37,13 +37,98 @@
             <td>{{ worker[9] }}</td>
             <td>{{ worker[10] }}</td>
             <td>{{ worker[11] }}</td>
-            <td><button class="fire-button" data-worker-id="{{ worker[0] }}">Уволить</button></td>
+            <td>
+                <button class="fire-button" data-worker-id="{{ worker[0] }}" title="Уволить">❌</button>
+                <button class="edit-button" data-worker-id="{{ worker[0] }}" title="Редактировать">✏️</button>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+<!-- Edit Worker Popup -->
+<div id="editWorkerPopup" class="popup">
+    <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2>Редактировать преподавателя</h2>
+        <form id="editWorkerForm" method="POST" action="{{ url_for('edit_worker') }}">
+            <input type="hidden" id="oldWorkerId" name="old_worker_id">
+            <label for="editWorkerId">ИД из АИС ЭПО:</label>
+            <input type="text" id="editWorkerId" name="worker_id" required><br><br>
+
+            <label for="editFio">ФИО:</label>
+            <input type="text" id="editFio" name="fio" required><br><br>
+
+            <label for="editPosition">Должность:</label>
+            <input type="text" id="editPosition" name="position" ><br><br>
+
+            <label for="editEducationLevel">Уровень образования:</label>
+            <input type="text" id="editEducationLevel" name="education_level" ><br><br>
+
+            <label for="editSpecialty">Специальность:</label>
+            <input type="text" id="editSpecialty" name="specialty" ><br><br>
+
+            <label for="editQualification">Квалификация:</label>
+            <input type="text" id="editQualification" name="qualification" ><br><br>
+
+            <label for="editAcademicDegree">Ученая степень:</label>
+            <input type="text" id="editAcademicDegree" name="academic_degree"><br><br>
+
+            <label for="editAcademicTitle">Ученое звание:</label>
+            <input type="text" id="editAcademicTitle" name="academic_title"><br><br>
+
+            <label for="editProfessionalRetraining">Повышение квалификации:</label>
+            <input type="text" id="editProfessionalRetraining" name="professional_retraining"><br><br>
+
+            <label for="editTotalExperience">Общий стаж работы:</label>
+            <input type="number" id="editTotalExperience" name="total_experience" ><br><br>
+
+            <label for="editSpecialtyExperience">Стаж работы по специальности:</label>
+            <input type="number" id="editSpecialtyExperience" name="specialty_experience" ><br><br>
+
+            <label for="editCourses">Курсы:</label>
+            <input type="text" id="editCourses" name="courses" ><br><br>
+
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+    .popup-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close:hover {
+        color: black;
+    }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.edit-button');
+        const popup = document.getElementById('editWorkerPopup');
+        const closeButton = document.querySelector('.close');
+        const editWorkerForm = document.getElementById('editWorkerForm');
         const fireButtons = document.querySelectorAll('.fire-button');
 
         fireButtons.forEach(button => {
@@ -67,6 +152,74 @@
                 })
                 .catch(error => console.error('Error:', error));  // Debug print
             });
+        });
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const workerId = this.dataset.workerId;
+                fetch(`/get_worker?worker_id=${workerId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('oldWorkerId').value = data.worker_id;
+                        document.getElementById('editWorkerId').value = data.worker_id;
+                        document.getElementById('editFio').value = data.fio;
+                        document.getElementById('editPosition').value = data.position;
+                        document.getElementById('editEducationLevel').value = data.education_level;
+                        document.getElementById('editSpecialty').value = data.specialty;
+                        document.getElementById('editQualification').value = data.qualification;
+                        document.getElementById('editAcademicDegree').value = data.academic_degree || '';
+                        document.getElementById('editAcademicTitle').value = data.academic_title || '';
+                        document.getElementById('editProfessionalRetraining').value = data.professional_retraining || '';
+                        document.getElementById('editTotalExperience').value = data.total_experience;
+                        document.getElementById('editSpecialtyExperience').value = data.specialty_experience;
+                        document.getElementById('editCourses').value = data.courses;
+                        popup.style.display = 'block';
+                    });
+            });
+        });
+
+        closeButton.addEventListener('click', function() {
+            popup.style.display = 'none';
+        });
+
+        editWorkerForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(editWorkerForm);
+            fetch('/edit_worker', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Преподаватель обновлен');
+                    window.location.reload();  // Refresh the page
+                } else if (data.status === 'error') {
+                    alert(data.message);  // Display the error message
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при обновлении преподавателя');
+            });
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === popup) {
+                popup.style.display = 'none';
+            }
         });
     });
 </script>
