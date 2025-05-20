@@ -17,6 +17,84 @@
         .content {
             padding: 20px;
         }
+        /* Основной класс .item */
+        .item {
+            padding: 9px 11px;
+            display: block;
+            margin-top: 8px;
+            font-size: 12pt;
+            border-color: #476DB3;
+            border: solid 1px;
+            color: #476DB3;
+            border-radius: 10px;
+        }
+
+        /* Форматирование стрелочки ➤ */
+        .chevron-down-icon {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Раскрытое состояние */
+        details[open] .chevron-down-icon {
+            transform: rotate(-180deg); /* Стрелочка поворачивается вниз */
+        }
+
+        /* Переход при открытии блока */
+        details {
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(.4,.2,.2,1); /* плавная анимация открытия */
+        }
+
+        /* Элементы списка работников скрыты изначально */
+        .worker-list {
+            height: auto;
+            opacity: 0;
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* Открытие блока: показ содержания */
+        details[open] .worker-list {
+            opacity: 1;
+            transform: scaleY(1);
+            background-color: #F0F0FF; /* Светлый синий фон открытого блока */
+            padding: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        /* Кнопка удаления преподавателя */
+        .unassign-button {
+            background-color: transparent;
+            border: none;
+            color: #476DB3;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Оформление закрытого состояния (заголовок блока) */
+        .summary span {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Скрыть маркеры списка в блоке */
+        .worker-list ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Внешний вид пунктов списка сотрудников */
+        .assigned-worker {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
     </style>
 </head>
 <body>

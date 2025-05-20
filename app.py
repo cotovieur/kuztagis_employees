@@ -196,7 +196,7 @@ def items():
 def assign():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM workers')
+    cursor.execute('SELECT * FROM workers ORDER BY fio ASC')
     workers = cursor.fetchall()
 
     # Fetch items with their assigned workers
@@ -259,4 +259,5 @@ def remove_worker_from_item():
         return jsonify({'status': 'worker_not_found'})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    #app.run(host='0.0.0.0', port=5000, debug=True) #server maintain
+    app.run(debug=True) #local maintain

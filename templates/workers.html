@@ -7,18 +7,18 @@
 <table>
     <thead>
         <tr>
-            <th>ИД</th>
+            <th>ИД из АИС ЭПО</th>
             <th>ФИО</th>
             <th>Должность</th>
             <th>Уровень образования</th>
-            <th>Специальность</th>
+            <th>Наименование подготовки и (или) специальности:</th>
             <th>Квалификация</th>
             <th>Ученая степень</th>
             <th>Ученое звание</th>
-            <th>Повышение квалификации</th>
+            <th>Повышение квалификации и профессиональная переподготовка</th>
             <th>Общий стаж работы</th>
             <th>Стаж работы по специальности</th>
-            <th>Курсы</th>
+            <th>Преподаваемые учебные предметы, курсы, дисциплины (модули):</th>
             <th></th>
         </tr>
     </thead>
@@ -64,7 +64,7 @@
             <label for="editEducationLevel">Уровень образования:</label>
             <input type="text" id="editEducationLevel" name="education_level" ><br><br>
 
-            <label for="editSpecialty">Специальность:</label>
+            <label for="editSpecialty">Наименование подготовки и (или) специальности:</label>
             <input type="text" id="editSpecialty" name="specialty" ><br><br>
 
             <label for="editQualification">Квалификация:</label>
@@ -76,16 +76,16 @@
             <label for="editAcademicTitle">Ученое звание:</label>
             <input type="text" id="editAcademicTitle" name="academic_title"><br><br>
 
-            <label for="editProfessionalRetraining">Повышение квалификации:</label>
+            <label for="editProfessionalRetraining">Повышение квалификации и профессиональная переподготовка</label>
             <input type="text" id="editProfessionalRetraining" name="professional_retraining"><br><br>
 
             <label for="editTotalExperience">Общий стаж работы:</label>
-            <input type="number" id="editTotalExperience" name="total_experience" ><br><br>
+            <input type="text" id="editTotalExperience" name="total_experience" ><br><br>
 
             <label for="editSpecialtyExperience">Стаж работы по специальности:</label>
-            <input type="number" id="editSpecialtyExperience" name="specialty_experience" ><br><br>
+            <input type="text" id="editSpecialtyExperience" name="specialty_experience" ><br><br>
 
-            <label for="editCourses">Курсы:</label>
+            <label for="editCourses">Преподаваемые учебные предметы, курсы, дисциплины (модули):</label>
             <input type="text" id="editCourses" name="courses" ><br><br>
 
             <button type="submit">Сохранить</button>
@@ -189,6 +189,14 @@
 
         editWorkerForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent the default form submission
+
+            const workerId = document.getElementById('editWorkerId').value;
+
+            // Validate worker_id
+            if (!/^\d{5,6}$/.test(workerId)) {
+                alert('Worker ID must be a 5 to 6 digit integer');
+                return;
+            }
 
             const formData = new FormData(editWorkerForm);
             fetch('/edit_worker', {

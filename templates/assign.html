@@ -5,47 +5,73 @@
 {% block content %}
 <h1>Назначить преподавателей</h1>
 <div style="display: flex;">
-    <div style="width: 50%; padding: 20px; background-color: #f0f8ff;">
+    <div style="width: 50%; padding: 20px;">
         <h2>Специальности и Профессии</h2>
         {% for item in items %}
         <div class="item {% if item[2] %}specialty{% else %}profession{% endif %}" data-id="{{ item[0] }}">
-            {% if item[3] %}
-            <details open>
-                <summary>{{ item[1] }} ({{ item[3].split(',') | length }})</summary>
-                <div class="worker-list">
-                    {% for worker_fio in item[3].split(',') %}
-                        <div class="assigned-worker">
-                            {{ worker_fio }}
-                            <button class="unassign-button" data-worker-fio="{{ worker_fio }}" data-item-id="{{ item[0] }}">-</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </details>
-            {% else %}
             <details>
-                <summary>{{ item[1] }} (0)</summary>
+                <summary style="list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                    <span>{{ item[1] }} ({% if item[3] %}{{ item[3].split(',')|length }}{% else %}0{% endif %})</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
                 <div class="worker-list">
-                    <p>Нет назначенных преподавателей</p>
+                    {% if item[3] %}
+                        {% for worker_fio in item[3].split(',') %}
+                            <div class="assigned-worker">
+                                {{ worker_fio }}
+                                <button class="unassign-button" data-worker-fio="{{ worker_fio }}" data-item-id="{{ item[0] }}">✖</button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Нет назначенных преподавателей</p>
+                    {% endif %}
                 </div>
             </details>
-            {% endif %}
         </div>
         {% endfor %}
     </div>
-    <div style="width: 50%; padding: 20px; background-color: #e6ffe6;">
+    <div style="width: 50%; padding: 20px">
         <h2>Преподаватели</h2>
-        {% for worker in workers %}
-        <div class="worker" draggable="true" data-id="{{ worker[0] }}">
-            {{ worker[1] }}
+        <input type="text" id="searchInput" placeholder="Поиск по ФИО..." title="Введите ФИО" 
+        style="width: 100%; padding: 10px; margin-bottom: 10px;">
+
+        <div id="workersContainer">
+            {% for worker in workers %}
+            <div class="worker" draggable="true" data-id="{{ worker[0] }}"
+            style="display: inline-grid;
+            font-size: 11pt;
+            margin-top: 5px;
+            padding: 7px 7px;
+            border-radius: 10px;
+            background-color: #E3FFE2;
+            color: #197215;
+            transition: background-color 0.3s ease;">
+                ⋮ {{ worker[1] }}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const workersContainer = document.getElementById('workersContainer');
         const workers = document.querySelectorAll('.worker');
         const items = document.querySelectorAll('.item');
         const unassignButtons = document.querySelectorAll('.unassign-button');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            workers.forEach(worker => {
+                const fio = worker.textContent.toLowerCase();
+                if (fio.startsWith(searchTerm)) {
+                    worker.style.display = 'inline-grid';
+                } else {
+                    worker.style.display = 'none';
+                }
+            });
+        });
 
         workers.forEach(worker => {
             worker.addEventListener('dragstart', function(e) {

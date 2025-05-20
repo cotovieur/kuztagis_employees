@@ -2,3 +2,5 @@ workers.db
 run app.bat
 run db_setup.bat
 run inspect_db.bat
+users.json
+kuztagis_employees — ярлык.lnk
