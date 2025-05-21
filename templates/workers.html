@@ -38,8 +38,9 @@
             <td>{{ worker[10] }}</td>
             <td>{{ worker[11] }}</td>
             <td>
+                <button class="edit-button" data-worker-id="{{ worker[0] }}" title="Редактировать">✏️</button>                
                 <button class="fire-button" data-worker-id="{{ worker[0] }}" title="Уволить">❌</button>
-                <button class="edit-button" data-worker-id="{{ worker[0] }}" title="Редактировать">✏️</button>
+
             </td>
         </tr>
         {% endfor %}
@@ -48,7 +49,7 @@
 <!-- Edit Worker Popup -->
 <div id="editWorkerPopup" class="popup">
     <div class="popup-content">
-        <span class="close">&times;</span>
+        <span class="close">×</span>
         <h2>Редактировать преподавателя</h2>
         <form id="editWorkerForm" method="POST" action="{{ url_for('edit_worker') }}">
             <input type="hidden" id="oldWorkerId" name="old_worker_id">
@@ -56,19 +57,19 @@
             <input type="text" id="editWorkerId" name="worker_id" required><br><br>
 
             <label for="editFio">ФИО:</label>
-            <input type="text" id="editFio" name="fio" required><br><br>
+            <textarea type="text" id="editFio" name="fio" required cols="40" rows="2"></textarea><br><br>
 
             <label for="editPosition">Должность:</label>
             <input type="text" id="editPosition" name="position" ><br><br>
 
             <label for="editEducationLevel">Уровень образования:</label>
-            <input type="text" id="editEducationLevel" name="education_level" ><br><br>
+            <textarea type="text" id="editEducationLevel" name="education_level" cols="40" rows="2"></textarea><br><br>
 
             <label for="editSpecialty">Наименование подготовки и (или) специальности:</label>
-            <input type="text" id="editSpecialty" name="specialty" ><br><br>
+            <textarea type="text" id="editSpecialty" name="specialty" cols="40" rows="2"></textarea><br><br>
 
             <label for="editQualification">Квалификация:</label>
-            <input type="text" id="editQualification" name="qualification" ><br><br>
+            <textarea type="text" id="editQualification" name="qualification" cols="40" rows="2"></textarea><br><br>
 
             <label for="editAcademicDegree">Ученая степень:</label>
             <input type="text" id="editAcademicDegree" name="academic_degree"><br><br>
@@ -77,7 +78,7 @@
             <input type="text" id="editAcademicTitle" name="academic_title"><br><br>
 
             <label for="editProfessionalRetraining">Повышение квалификации и профессиональная переподготовка</label>
-            <input type="text" id="editProfessionalRetraining" name="professional_retraining"><br><br>
+            <textarea type="text" id="editProfessionalRetraining" name="professional_retraining" cols="40" rows="5"></textarea><br><br>
 
             <label for="editTotalExperience">Общий стаж работы:</label>
             <input type="text" id="editTotalExperience" name="total_experience" ><br><br>
@@ -86,42 +87,12 @@
             <input type="text" id="editSpecialtyExperience" name="specialty_experience" ><br><br>
 
             <label for="editCourses">Преподаваемые учебные предметы, курсы, дисциплины (модули):</label>
-            <input type="text" id="editCourses" name="courses" ><br><br>
+            <textarea type="text" id="editCourses" name="courses" cols="40" rows="5"></textarea><br><br>
 
             <button type="submit">Сохранить</button>
         </form>
     </div>
 </div>
-
-<style>
-    .popup {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1;
-    }
-    .popup-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-    }
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .close:hover {
-        color: black;
-    }
-</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

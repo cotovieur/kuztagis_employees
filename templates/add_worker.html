@@ -3,46 +3,49 @@
 {% block title %}+ Новый преподаватель{% endblock %}
 
 {% block content %}
-<h1>Новый преподаватель</h1>
+<div class="popup-content">
+    <h1>Новый преподаватель</h1>
     <form id="addWorkerForm" method="POST" action="{{ url_for('add_worker') }}">
         <label for="aisepo_id">ИД из АИС ЭПО:</label>
-        <input type="number" id="aisepo_id" name="aisepo_id" minlength="5" maxlength="6" required><br><br>
+        <input type="number" id="aisepo_id" name="aisepo_id" required placeholder="ИД в АИС ЭПО составляет 5-6 цифр"><br><br>
 
         <label for="fio">ФИО:</label>
-        <input type="text" id="fio" name="fio" required><br><br>
+        <input type="text" id="fio" name="fio" required placeholder="Фамилия Имя Отчество"><br><br>
 
         <label for="position">Должность:</label>
-        <input type="text" id="position" name="position"><br><br>
+        <input type="text" id="position" name="position" placeholder="Учитель математики, преподаватель физики и т.п."><br><br>
 
         <label for="education_level">Уровень образования:</label>
-        <input type="text" id="education_level" name="education_level" ><br><br>
+        <input type="text" id="education_level" name="education_level" placeholder="Высшее. Кузбасский государственный технический университет"><br><br>
 
         <label for="specialty">Наименование подготовки и (или) специальности:</label>
-        <input type="text" id="specialty" name="specialty" ><br><br>
+        <input type="text" id="specialty" name="specialty" placeholder="Напр.: математика, физика, биология и т.п."><br><br>
 
         <label for="qualification">Квалификация:</label>
-        <input type="text" id="qualification" name="qualification" ><br><br>
+        <input type="text" id="qualification" name="qualification" placeholder="Бакалавр, магистр, специалист по физической культуре и спорту"><br><br>
 
         <label for="academic_degree">Ученая степень:</label>
-        <input type="text" id="academic_degree" name="academic_degree"><br><br>
+        <input type="text" id="academic_degree" name="academic_degree" placeholder="Доктор наук, кандидат наук и т.п."><br><br>
 
         <label for="academic_title">Ученое звание:</label>
-        <input type="text" id="academic_title" name="academic_title"><br><br>
+        <input type="text" id="academic_title" name="academic_title" placeholder="Доцент, профессор и т.п."><br><br>
 
         <label for="professional_retraining">Повышение квалификации и профессиональная переподготовка</label>
-        <textarea type="text" id="professional_retraining" name="professional_retraining" cols="40" rows="5"></textarea><br><br>
+        <textarea type="text" id="professional_retraining" name="professional_retraining" cols="40" rows="5" placeholder="Перечислите пройденные курсы повышения квалификации и профессиональной переподготовки"></textarea><br><br>
 
         <label for="total_experience">Общий стаж работы:</label>
-        <input type="text" id="total_experience" name="total_experience" ><br><br>
+        <input type="text" id="total_experience" name="total_experience" placeholder="Количество лет общего трудового стажа"><br><br>
 
         <label for="specialty_experience">Стаж работы по специальности:</label>
-        <input type="text" id="specialty_experience" name="specialty_experience" ><br><br>
+        <input type="text" id="specialty_experience" name="specialty_experience" placeholder="Количество лет стажа по специальности"><br><br>
 
         <label for="courses">Преподаваемые учебные предметы, курсы, дисциплины (модули):</label>
-        <textarea type="text" id="courses" name="courses" cols="40" rows="5"></textarea><br><br>
-        
+        <textarea type="text" id="courses" name="courses" cols="40" rows="5" placeholder="Перечислите преподаваемые учебные предметы, курсы, дисциплины (модули)"></textarea><br><br>
+
         <button type="submit">Создать</button>
     </form>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const addWorkerForm = document.getElementById('addWorkerForm');

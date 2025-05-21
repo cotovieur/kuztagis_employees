@@ -5,10 +5,10 @@
 {% block content %}
 <h1>Назначить преподавателей</h1>
 <div style="display: flex;">
-    <div style="width: 50%; padding: 20px;">
+    <div class="scrollable">
         <h2>Специальности и Профессии</h2>
         {% for item in items %}
-        <div class="item {% if item[2] %}specialty{% else %}profession{% endif %}" data-id="{{ item[0] }}">
+        <div class="item-{% if item[2] %}specialty{% else %}profession{% endif %}" data-id="{{ item[0] }}">
             <details>
                 <summary style="list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
                     <span>{{ item[1] }} ({% if item[3] %}{{ item[3].split(',')|length }}{% else %}0{% endif %})</span>
@@ -30,10 +30,10 @@
         </div>
         {% endfor %}
     </div>
-    <div style="width: 50%; padding: 20px">
+    <div class="scrollable">
         <h2>Преподаватели</h2>
         <input type="text" id="searchInput" placeholder="Поиск по ФИО..." title="Введите ФИО" 
-        style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        style="padding: 10px; margin-bottom: 10px;">
 
         <div id="workersContainer">
             {% for worker in workers %}
@@ -125,6 +125,27 @@
                     }
                 });
             });
+        });
+
+        const scrollableBlocks = document.querySelectorAll('.scrollable');
+
+        // Функция проверки положения прокрутки
+        function handleGradient(block) {
+            const scrollHeight = block.scrollHeight;
+            const clientHeight = block.clientHeight;
+            const scrollTop = block.scrollTop;
+
+            // Проверяем, достигнута ли нижняя точка
+            if ((scrollTop + clientHeight) >= scrollHeight) {
+                block.classList.add('no-gradient'); // Убираем градиент
+            } else {
+                block.classList.remove('no-gradient'); // Возвращаем градиент обратно
+            }
+        }
+
+        // Назначаем обработчик события прокрутки каждому блоку
+        scrollableBlocks.forEach((block) => {
+            block.addEventListener('scroll', () => handleGradient(block));
         });
     });
 </script>
