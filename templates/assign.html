@@ -37,15 +37,7 @@
 
         <div id="workersContainer">
             {% for worker in workers %}
-            <div class="worker" draggable="true" data-id="{{ worker[0] }}"
-            style="display: inline-grid;
-            font-size: 11pt;
-            margin-top: 5px;
-            padding: 7px 7px;
-            border-radius: 10px;
-            background-color: #E3FFE2;
-            color: #197215;
-            transition: background-color 0.3s ease;">
+            <div class="worker" draggable="true" data-id="{{ worker[0] }}">
                 ⋮ {{ worker[1] }}
             </div>
             {% endfor %}
@@ -55,17 +47,19 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
+        searchInput.focus();
         const workersContainer = document.getElementById('workersContainer');
         const workers = document.querySelectorAll('.worker');
         const items = document.querySelectorAll('.item');
         const unassignButtons = document.querySelectorAll('.unassign-button');
 
+        // Search functionality
         searchInput.addEventListener('input', function() {
             const searchTerm = searchInput.value.toLowerCase();
 
             workers.forEach(worker => {
                 const fio = worker.textContent.toLowerCase();
-                if (fio.startsWith(searchTerm)) {
+                if (fio.includes(searchTerm)) {  // Use includes instead of startsWith for more flexible search
                     worker.style.display = 'inline-grid';
                 } else {
                     worker.style.display = 'none';
@@ -73,6 +67,7 @@
             });
         });
 
+        // Drag and drop functionality
         workers.forEach(worker => {
             worker.addEventListener('dragstart', function(e) {
                 e.dataTransfer.setData('text/plain', worker.dataset.id);

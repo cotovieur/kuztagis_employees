@@ -17,7 +17,21 @@
         .content {
             padding: 20px;
         }
-        /* Основной класс .item */
+        .worker{
+            display: inline-grid;
+            cursor: grab;
+            font-size: 11pt;
+            margin-top: 5px;
+            padding: 7px 7px;
+            border-radius: 10px;
+            background-color: #E3FFE2;
+            color: #197215;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .worker:hover{
+            transform: scale(1.075);
+            background-color: #B1E9AF;
+        }
         .item {
             padding: 9px 11px;
             display: block;
