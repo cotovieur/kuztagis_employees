@@ -1,6 +1,7 @@
     body {
         font-family: Arial, sans-serif;
         overflow:hidden;
+        margin:0;
     }
     nav {
         background-color: #f8f8f8;
@@ -59,27 +60,22 @@
         background-color: #B1E9AF;
         margin: 0 8px 0 8px;*
     }
-    .item-specialty {
+    .item{
         vertical-align: top;
         padding: 9px 11px;
         display: inline-block;
         margin-top: 8px;
         font-size: 12pt;
-        border-color: #476DB3;
         border: solid 1px;
+        border-radius: 10px;        
+    }
+    .item-specialty {
+        border-color: #476DB3;
         color: #476DB3;
-        border-radius: 10px;
     }
     .item-profession {
-        vertical-align: top;
-        padding: 9px 11px;
-        display: inline-block;
-        margin-top: 8px;
-        font-size: 12pt;
         border-color: #8B45B9;
-        border: solid 1px;
         color: #8B45B9;
-        border-radius: 10px;
     }
 
     /* Форматирование стрелочки ➤ */
@@ -213,7 +209,7 @@
         cursor: pointer;
     }
     /*Pop-up изменения данных преподавателя*/
-        .popup {
+    .popup {
         display: none;
         position: fixed;
         top: 0;

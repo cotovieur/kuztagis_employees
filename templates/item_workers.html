@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Вставка на сайт{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        overflow: hidden;
+        margin: 0;
+    }
+    .container {
+        display: flex;
+        flex-direction: column;
+        height: 90vh;
+    }
+    .spoiler-container {
+        height: 50%;
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        scrollbar-width: thin;
+    }
+    .spoiler {
+        border: 1px solid #ccc;
+        margin: 10px 0;
+        padding: 16px;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .spoiler-header {
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+    .spoiler-content {
+        display: none;
+        padding: 10px;
+        margin-top: 10px;
+        border-top: 1px solid #ccc;
+    }
+    .spoiler-content.open {
+        display: block;
+    }
+    .chevron-down-icon {
+        width: 24px;
+        height: 24px;
+        transition: transform 0.3s ease-in-out;
+    }
+    .chevron-down-icon.rotated {
+        transform: rotate(-180deg);
+    }
+    .code-window {
+        height: 50%;
+        border: 1px solid #ccc;
+        margin-top: 20px;
+        padding: 10px;
+        overflow-y: auto;
+        background-color: #282c34;
+        color: #abb2bf;
+        font-family: monospace;
+        scrollbar-width: thin;
+        position: relative;
+    }
+    .copy-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .copy-button:hover {
+        background-color: #45a049;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11pt;
+        background-color: white;
+    }
+    table thead th {
+        font-weight: normal;
+        text-align: center;
+        border: 1px solid #ddd;
+        padding: 8px;
+        background: #EDEDED;
+        font-size: 14px;
+    }
+    table tbody td {
+        text-align: left;
+        border: 1px solid #ddd;
+        padding: 8px;
+        font-size: 14px;
+        vertical-align: top;
+    }
+    table tbody tr:nth-child(even) {
+        background: #F8F8F8;
+    }
+</style>
+
+<h1>Вставка на сайт</h1>
+<div class="container">
+    <div class="spoiler-container">
+        {% for item in items %}
+        <div class="spoiler">
+            <div class="spoiler-header" onclick="toggleSpoiler(this)">
+                <span>{{ item[1] }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="spoiler-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>ФИО</th>
+                            <th>Должность</th>
+                            <th>Уровень образования</th>
+                            <th>Наименование подготовки и (или) специальности:</th>
+                            <th>Квалификация</th>
+                            <th>Ученая степень</th>
+                            <th>Ученое звание</th>
+                            <th>Повышение квалификации и профессиональная переподготовка</th>
+                            <th>Общий стаж работы</th>
+                            <th>Стаж работы по специальности</th>
+                            <th>Преподаваемые учебные предметы, курсы, дисциплины (модули):</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for worker in item_worker_details[item[0]] %}
+                        <tr>
+                            <td></td>
+                            <td>{{ worker[1] }}</td>
+                            <td>{{ worker[2] }}</td>
+                            <td>{{ worker[3] }}</td>
+                            <td>{{ worker[4] }}</td>
+                            <td>{{ worker[5] }}</td>
+                            <td>{{ worker[6] }}</td>
+                            <td>{{ worker[7] }}</td>
+                            <td>{{ worker[8] }}</td>
+                            <td>{{ worker[9] }}</td>
+                            <td>{{ worker[10] }}</td>
+                            <td>{{ worker[11] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="code-window">
+        <button class="copy-button" onclick="copyCode()">Copy Code</button>
+        <pre id="codeContent">
+&lt;div class="container"&gt;
+    &lt;div class="spoiler-container"&gt;
+        {% for item in items %}
+        &lt;div class="spoiler"&gt;
+            &lt;div class="spoiler-header" onclick="toggleSpoiler(this)"&gt;
+                &lt;span&gt;{{ item[1] }}&lt;/span&gt;
+                &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;&lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;&lt;/svg&gt;
+            &lt;/div&gt;
+            &lt;div class="spoiler-content"&gt;
+                &lt;table&gt;
+                    &lt;thead&gt;
+                        &lt;tr&gt;
+                            &lt;th&gt;&lt;/th&gt;
+                            &lt;th&gt;ФИО&lt;/th&gt;
+                            &lt;th&gt;Должность&lt;/th&gt;
+                            &lt;th&gt;Уровень образования&lt;/th&gt;
+                            &lt;th&gt;Наименование подготовки и (или) специальности:&lt;/th&gt;
+                            &lt;th&gt;Квалификация&lt;/th&gt;
+                            &lt;th&gt;Ученая степень&lt;/th&gt;
+                            &lt;th&gt;Ученое звание&lt;/th&gt;
+                            &lt;th&gt;Повышение квалификации и профессиональная переподготовка&lt;/th&gt;
+                            &lt;th&gt;Общий стаж работы&lt;/th&gt;
+                            &lt;th&gt;Стаж работы по специальности&lt;/th&gt;
+                            &lt;th&gt;Преподаваемые учебные предметы, курсы, дисциплины (модули):&lt;/th&gt;
+                        &lt;/tr&gt;
+                    &lt;/thead&gt;
+                    &lt;tbody&gt;
+                        {% for worker in item_worker_details[item[0]] %}
+                        &lt;tr&gt;
+                            &lt;td&gt;&lt;/td&gt;
+                            &lt;td&gt;{{ worker[1] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[2] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[3] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[4] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[5] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[6] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[7] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[8] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[9] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[10] }}&lt;/td&gt;
+                            &lt;td&gt;{{ worker[11] }}&lt;/td&gt;
+                        &lt;/tr&gt;
+                        {% endfor %}
+                    &lt;/tbody&gt;
+                &lt;/table&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        {% endfor %}
+    &lt;/div&gt;
+&lt;/div&gt;
+        </pre>
+    </div>
+</div>
+
+<script>
+    function copyCode() {
+        const codeContent = document.getElementById('codeContent');
+        const range = document.createRange();
+        range.selectNode(codeContent);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        alert('Code copied to clipboard!');
+    }
+
+    function toggleSpoiler(header) {
+        const spoiler = header.parentElement;
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.chevron-down-icon');
+
+        if (content.classList.contains('open')) {
+            content.classList.remove('open');
+            icon.classList.remove('rotated');
+        } else {
+            content.classList.add('open');
+            icon.classList.add('rotated');
+        }
+    }
+</script>
+{% endblock %}

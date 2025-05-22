@@ -258,6 +258,34 @@ def remove_worker_from_item():
         conn.close()
         return jsonify({'status': 'worker_not_found'})
 
+@app.route('/item_workers')
+def item_workers():
+    conn = sqlite3.connect('workers.db')
+    cursor = conn.cursor()
+
+    # Fetch items
+    cursor.execute('SELECT * FROM items')
+    items = cursor.fetchall()
+
+    # Fetch worker details for each item
+    item_worker_details = {}
+    for item in items:
+        item_id = item[0]
+        cursor.execute('''
+        SELECT w.worker_id, w.fio, w.position, w.education_level, w.specialty, w.qualification,
+               w.academic_degree, w.academic_title, w.professional_retraining,
+               w.total_experience, w.specialty_experience, w.courses
+        FROM workers w
+        JOIN worker_item wi ON w.worker_id = wi.worker_id
+        WHERE wi.item_id = ?
+        ''', (item_id,))
+        workers = cursor.fetchall()
+        item_worker_details[item_id] = workers
+
+    conn.close()
+    return render_template('item_workers.html', items=items, item_worker_details=item_worker_details)
+
+
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', port=5000, debug=True) #server maintain
     app.run(debug=True) #local maintain
