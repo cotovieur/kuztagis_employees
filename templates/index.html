@@ -3,6 +3,7 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<h1>Добро пожаловать</h1>
+<h1>Добро пожаловать, {{ username }}!</h1>
+<a href="{{ url_for('logout') }}">Logout</a>
 <p>Выберите один из пунктов меню для продолжения.</p>
 {% endblock %}

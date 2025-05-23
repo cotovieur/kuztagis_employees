@@ -1,39 +1,77 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 import sqlite3
+import json
+import os
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+from functools import wraps
+
+#Load secretkey for users login from secretkey.env
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY')
 
-# Checking if worker_id or fio is already recorded
-def check_worker_exists(conn, worker_id=None, fio=None, exclude_worker_id=None):
-    cursor = conn.cursor()
+# Load users from JSON file
+def load_users():
+    try:
+        if os.path.exists('users.json'):
+            with open('users.json', 'r') as file:
+                return json.load(file)
+    except json.JSONDecodeError:
+        pass
+    return {"users": []}
 
-    if worker_id is not None:
-        query = 'SELECT 1 FROM workers WHERE worker_id = ?'
-        params = (worker_id,)
-        if exclude_worker_id is not None:
-            query += ' AND worker_id != ?'
-            params += (exclude_worker_id,)
-        cursor.execute(query, params)
-        if cursor.fetchone():
-            return True, "Worker ID already exists"
+# Save users to JSON file
+def save_users(users):
+    with open('users.json', 'w') as file:
+        json.dump(users, file, indent=4)
 
-    if fio is not None:
-        query = 'SELECT 1 FROM workers WHERE fio = ?'
-        params = (fio,)
-        if exclude_worker_id is not None:
-            query += ' AND worker_id != ?'
-            params += (exclude_worker_id,)
-        cursor.execute(query, params)
-        if cursor.fetchone():
-            return True, "FIO already exists"
-
-    return False, None
+users_data = load_users()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'username' in session:
+        return render_template('index.html', username=session['username'])
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Validate username and password (example)
+        if username == 'admin' and password == 'secret':
+            session['username'] = username
+            return redirect(url_for('index'))
+
+    return '''
+        <form method="post">
+            <p><input type="text" name="username" placeholder="Username"></p>
+            <p><input type="password" name="password" placeholder="Password"></p>
+            <p><button type="submit">Login</button></p>
+        </form>
+    '''
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('You were successfully logged out!')
+    return redirect(url_for('login'))
 
 @app.route('/workers')
+@login_required
+def protected_workers():
+    return f"Hello, {session['username']}! This is a protected page."
 def workers():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
@@ -44,6 +82,9 @@ def workers():
 
 # Adding new worker
 @app.route('/add', methods=['GET', 'POST'])
+@login_required
+def protected_add():
+    return f"Hello, {session['username']}! This is a protected page."
 def add_worker():
     if request.method == 'POST':
         worker_id = request.form['aisepo_id']
@@ -130,6 +171,32 @@ def get_worker():
     else:
         return jsonify({'status': 'error', 'message': 'Worker not found'}), 404
 
+# Checking if worker_id or fio is already recorded
+def check_worker_exists(conn, worker_id=None, fio=None, exclude_worker_id=None):
+    cursor = conn.cursor()
+
+    if worker_id is not None:
+        query = 'SELECT 1 FROM workers WHERE worker_id = ?'
+        params = (worker_id,)
+        if exclude_worker_id is not None:
+            query += ' AND worker_id != ?'
+            params += (exclude_worker_id,)
+        cursor.execute(query, params)
+        if cursor.fetchone():
+            return True, "Worker ID already exists"
+
+    if fio is not None:
+        query = 'SELECT 1 FROM workers WHERE fio = ?'
+        params = (fio,)
+        if exclude_worker_id is not None:
+            query += ' AND worker_id != ?'
+            params += (exclude_worker_id,)
+        cursor.execute(query, params)
+        if cursor.fetchone():
+            return True, "FIO already exists"
+
+    return False, None
+
 @app.route('/edit_worker', methods=['POST'])
 def edit_worker():
     old_worker_id = request.form['old_worker_id']
@@ -179,6 +246,9 @@ def edit_worker():
     return jsonify({'status': 'success'})
 
 @app.route('/items')
+@login_required
+def protected_items():
+    return f"Hello, {session['username']}! This is a protected page."
 def items():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
@@ -193,6 +263,9 @@ def items():
     return render_template('items.html', items=items)
 
 @app.route('/assign')
+@login_required
+def protected_assign():
+    return f"Hello, {session['username']}! This is a protected page."
 def assign():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
@@ -259,6 +332,9 @@ def remove_worker_from_item():
         return jsonify({'status': 'worker_not_found'})
 
 @app.route('/item_workers')
+@login_required
+def protected_item_workers():
+    return f"Hello, {session['username']}! This is a protected page."
 def item_workers():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()

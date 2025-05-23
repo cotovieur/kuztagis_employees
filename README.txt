@@ -1,10 +1,17 @@
 This application provides handy assigning edu-workers to the specialities and professions they teach
 
+*REQUIRES*
+python
+flask
+flask-login
+python-dotenv
+from functools import wraps
+
 *WHAT IS WHAT*
 Workers contains edu-workers (teachers)
 Items containt specialities and professions, educational programms
-Assigning is required to finally form documents with list of working staff of each item and showing on the web-site of
-the educational department
+Assigning is required to finally form documents with list of working staff of each item and showing on the web-site of the educational department
+users.json contains user logins and hashed passwords
 
 *DATABASE STRUCTURE*
 CREATE TABLE "items" (
