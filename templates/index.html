@@ -1,10 +1,10 @@
-//index.html
+<!-- index.html -->
 {% extends "base.html" %}
 
 {% block title %}Главная{% endblock %}
 
 {% block content %}
 <h1>Добро пожаловать, {{ username }}!</h1>
-<a href="{{ url_for('logout') }}">Logout</a>
+<a href="{{ url_for('logout') }}">Выйти</a>
 <p>Выберите один из пунктов меню для продолжения.</p>
 {% endblock %}

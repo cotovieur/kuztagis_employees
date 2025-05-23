@@ -54,10 +54,10 @@ def login():
         for user in users['users']:
             if user['username'] == username and check_password_hash(user['password'], password):
                 session['username'] = username
-                flash('You were successfully logged in!')
+                flash('Успешный вход!')
                 return redirect(url_for('index'))
 
-        flash('Invalid credentials!')
+        flash('Неверный логин/пароль!')
         return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -73,13 +73,11 @@ def login_required(f):
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    flash('You were successfully logged out!')
+    flash('Успешный выход!')
     return redirect(url_for('login'))
 
 @app.route('/workers')
 @login_required
-def protected_workers():
-    return f"Hello, {session['username']}! This is a protected page."
 def workers():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
@@ -91,8 +89,6 @@ def workers():
 # Adding new worker
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
-def protected_add():
-    return f"Hello, {session['username']}! This is a protected page."
 def add_worker():
     if request.method == 'POST':
         worker_id = request.form['aisepo_id']
@@ -255,8 +251,6 @@ def edit_worker():
 
 @app.route('/items')
 @login_required
-def protected_items():
-    return f"Hello, {session['username']}! This is a protected page."
 def items():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
@@ -272,8 +266,6 @@ def items():
 
 @app.route('/assign')
 @login_required
-def protected_assign():
-    return f"Hello, {session['username']}! This is a protected page."
 def assign():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
@@ -341,8 +333,6 @@ def remove_worker_from_item():
 
 @app.route('/item_workers')
 @login_required
-def protected_item_workers():
-    return f"Hello, {session['username']}! This is a protected page."
 def item_workers():
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()

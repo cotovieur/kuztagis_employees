@@ -257,7 +257,7 @@
         color: #333;
     }
 
-    input[type="text"],
+    input[type="text"],[type="password"],
     textarea {
         padding: 10px;
         border: 1px solid #ccc;

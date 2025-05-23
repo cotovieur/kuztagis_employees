@@ -27,10 +27,19 @@ def add_user(users):
     if 'users' not in users:
         users['users'] = []
 
-    users['users'].append({
-        "username": username,
-        "password": hashed_password
-    })
+    # Check if the username already exists
+    user_exists = False
+    for user in users['users']:
+        if user['username'] == username:
+            user['password'] = hashed_password  # Update the password
+            user_exists = True
+            break
+
+    if not user_exists:
+        users['users'].append({
+            "username": username,
+            "password": hashed_password
+        })
 
     return True
 
