@@ -6,6 +6,9 @@ import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from functools import wraps
+import shutil
+from datetime import datetime
+import atexit
 
 # Load environment variables before creating the app
 load_dotenv('secretkey.env')  # Explicitly specify the filename
@@ -123,6 +126,11 @@ def add_worker():
             total_experience, specialty_experience, courses
         ))
         conn.commit()
+
+        # Check if backup is needed based on changes
+        if track_changes(conn):
+            backup_database('workers.db', 'backups')
+
         conn.close()
         return jsonify({'status': 'success'})
 
@@ -144,6 +152,11 @@ def fire_worker():
     cursor.execute('DELETE FROM worker_item WHERE worker_id = ?', (worker_id,))
 
     conn.commit()
+
+    # Check if backup is needed based on changes
+    if track_changes(conn):
+        backup_database('workers.db', 'backups')
+
     conn.close()
 
     return jsonify({'status': 'success'})
@@ -245,6 +258,11 @@ def edit_worker():
         total_experience, specialty_experience, courses, old_worker_id
     ))
     conn.commit()
+
+    # Check if backup is needed based on changes
+    if track_changes(conn):
+        backup_database('workers.db', 'backups')
+
     conn.close()
 
     return jsonify({'status': 'success'})
@@ -300,6 +318,11 @@ def add_worker_to_item():
     if not exists:
         cursor.execute('INSERT INTO worker_item (worker_id, item_id) VALUES (?, ?)', (worker_id, item_id))
         conn.commit()
+
+        # Check if backup is needed based on changes
+        if track_changes(conn):
+            backup_database('workers.db', 'backups')
+        
         conn.close()
         return jsonify({'status': 'success'})
     else:
@@ -324,6 +347,11 @@ def remove_worker_from_item():
         print(f"Removing worker_id: {worker_id} from item_id: {item_id}")  # Debug print
         cursor.execute('DELETE FROM worker_item WHERE worker_id = ? AND item_id = ?', (worker_id, item_id))
         conn.commit()
+
+        # Check if backup is needed based on changes
+        if track_changes(conn):
+            backup_database('workers.db', 'backups')
+
         conn.close()
         return jsonify({'status': 'success'})
     else:
@@ -359,7 +387,44 @@ def item_workers():
     conn.close()
     return render_template('item_workers.html', items=items, item_worker_details=item_worker_details)
 
+def backup_database(db_path, backup_dir):
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_path = os.path.join(backup_dir, f"backup_{timestamp}.db")
+
+    shutil.copy2(db_path, backup_path)
+    print(f"Database backed up to {backup_path}")
+
+def perform_backup_on_exit(db_path, backup_dir):
+    print("Performing backup before exiting...")
+    backup_database(db_path, backup_dir)
+
+def track_changes(conn):
+    cursor = conn.cursor()
+
+    # Check for changes in the workers table
+    cursor.execute('SELECT COUNT(*) FROM workers')
+    worker_count = cursor.fetchone()[0]
+
+    # Check for changes in the worker_item table
+    cursor.execute('SELECT COUNT(*) FROM worker_item')
+    worker_item_count = cursor.fetchone()[0]
+
+    # Define thresholds for triggering a backup
+    worker_threshold = 20
+    worker_item_threshold = 20
+
+    return worker_count >= worker_threshold or worker_item_count >= worker_item_threshold
+
 
 if __name__ == '__main__':
+    db_path = 'workers.db'
+    backup_dir = 'backups'
+
+    # Register the backup function to be called on exit
+    atexit.register(perform_backup_on_exit, db_path, backup_dir)
+
     #app.run(host='0.0.0.0', port=5000, debug=True) #server maintain
     app.run(debug=True) #local maintain
