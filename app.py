@@ -1,3 +1,4 @@
+#app.py
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 import sqlite3
 import json
@@ -6,11 +7,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from functools import wraps
 
-#Load secretkey for users login from secretkey.env
-load_dotenv()
+# Load environment variables before creating the app
+load_dotenv('secretkey.env')  # Explicitly specify the filename
 
 app = Flask(__name__)
+
+# Print the current working directory
+print("Current Working Directory:", os.getcwd())
 app.secret_key = os.getenv('SECRET_KEY')
+# Debug print to check if the secret key is loaded
+print("Secret Key:", app.secret_key)
 
 # Load users from JSON file
 def load_users():
@@ -41,18 +47,20 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Validate username and password (example)
-        if username == 'admin' and password == 'secret':
-            session['username'] = username
-            return redirect(url_for('index'))
+        # Load users
+        users = load_users()
 
-    return '''
-        <form method="post">
-            <p><input type="text" name="username" placeholder="Username"></p>
-            <p><input type="password" name="password" placeholder="Password"></p>
-            <p><button type="submit">Login</button></p>
-        </form>
-    '''
+        # Check if user exists and password is correct
+        for user in users['users']:
+            if user['username'] == username and check_password_hash(user['password'], password):
+                session['username'] = username
+                flash('You were successfully logged in!')
+                return redirect(url_for('index'))
+
+        flash('Invalid credentials!')
+        return redirect(url_for('login'))
+
+    return render_template('login.html')
 
 def login_required(f):
     @wraps(f)
