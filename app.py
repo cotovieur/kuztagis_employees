@@ -1,14 +1,16 @@
 #app.py
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 import sqlite3
-import json
+import shutil
 import os
+from datetime import datetime, timedelta
+import atexit
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+import threading
+import time
+import json
 from functools import wraps
-import shutil
-from datetime import datetime
-import atexit
 
 # Load environment variables before creating the app
 load_dotenv('secretkey.env')  # Explicitly specify the filename
@@ -37,6 +39,10 @@ def save_users(users):
         json.dump(users, file, indent=4)
 
 users_data = load_users()
+
+# Global variable to track the number of changes
+change_count = 0
+last_backup_time = datetime.now()
 
 @app.route('/')
 def index():
@@ -127,8 +133,11 @@ def add_worker():
         ))
         conn.commit()
 
+        # Increment change count
+        increment_change_count()
+
         # Check if backup is needed based on changes
-        if track_changes(conn):
+        if should_backup_based_on_changes():
             backup_database('workers.db', 'backups')
 
         conn.close()
@@ -153,8 +162,11 @@ def fire_worker():
 
     conn.commit()
 
+    # Increment change count
+    increment_change_count()
+
     # Check if backup is needed based on changes
-    if track_changes(conn):
+    if should_backup_based_on_changes():
         backup_database('workers.db', 'backups')
 
     conn.close()
@@ -259,10 +271,12 @@ def edit_worker():
     ))
     conn.commit()
 
-    # Check if backup is needed based on changes
-    if track_changes(conn):
-        backup_database('workers.db', 'backups')
+    # Increment change count
+    increment_change_count()
 
+    # Check if backup is needed based on changes
+    if should_backup_based_on_changes():
+        backup_database('workers.db', 'backups')
     conn.close()
 
     return jsonify({'status': 'success'})
@@ -319,10 +333,13 @@ def add_worker_to_item():
         cursor.execute('INSERT INTO worker_item (worker_id, item_id) VALUES (?, ?)', (worker_id, item_id))
         conn.commit()
 
+        # Increment change count
+        increment_change_count()
+
         # Check if backup is needed based on changes
-        if track_changes(conn):
+        if should_backup_based_on_changes():
             backup_database('workers.db', 'backups')
-        
+
         conn.close()
         return jsonify({'status': 'success'})
     else:
@@ -348,8 +365,11 @@ def remove_worker_from_item():
         cursor.execute('DELETE FROM worker_item WHERE worker_id = ? AND item_id = ?', (worker_id, item_id))
         conn.commit()
 
+        # Increment change count
+        increment_change_count()
+
         # Check if backup is needed based on changes
-        if track_changes(conn):
+        if should_backup_based_on_changes():
             backup_database('workers.db', 'backups')
 
         conn.close()
@@ -388,6 +408,7 @@ def item_workers():
     return render_template('item_workers.html', items=items, item_worker_details=item_worker_details)
 
 def backup_database(db_path, backup_dir):
+    global change_count, last_backup_time
     if not os.path.exists(backup_dir):
         os.makedirs(backup_dir)
 
@@ -397,26 +418,29 @@ def backup_database(db_path, backup_dir):
     shutil.copy2(db_path, backup_path)
     print(f"Database backed up to {backup_path}")
 
+    # Reset change count and update last backup time
+    change_count = 0
+    last_backup_time = datetime.now()
+
 def perform_backup_on_exit(db_path, backup_dir):
     print("Performing backup before exiting...")
     backup_database(db_path, backup_dir)
 
-def track_changes(conn):
-    cursor = conn.cursor()
+def should_backup_based_on_changes():
+    global change_count, last_backup_time
+    # Check if the number of changes exceeds the threshold
+    if change_count >= 20:
+        return True
 
-    # Check for changes in the workers table
-    cursor.execute('SELECT COUNT(*) FROM workers')
-    worker_count = cursor.fetchone()[0]
+    # Check if a week has passed since the last backup
+    if (datetime.now() - last_backup_time) >= timedelta(days=7):
+        return True
 
-    # Check for changes in the worker_item table
-    cursor.execute('SELECT COUNT(*) FROM worker_item')
-    worker_item_count = cursor.fetchone()[0]
+    return False
 
-    # Define thresholds for triggering a backup
-    worker_threshold = 20
-    worker_item_threshold = 20
-
-    return worker_count >= worker_threshold or worker_item_count >= worker_item_threshold
+def increment_change_count():
+    global change_count
+    change_count += 1
 
 
 if __name__ == '__main__':

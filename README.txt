@@ -1,16 +1,21 @@
+https://github.com/cotovieur/kuztagis_employees
+
 This application provides handy assigning edu-workers to the specialities and professions they teach.
 Assigning is required to finally form documents with list of working staff of each item and showing on the web-site of the educational department
 
 *REQUIRES*
 	python
-	flask
-	flask-login
-	python-dotenv
-	from functools import wraps
-	pip install schedule
-	from datetime import datetime
-	import atexit
+	import json
+	import sqlite3
 	import shutil
+	import os
+	from datetime import datetime, timedelta
+	import atexit
+	from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+	from werkzeug.security import generate_password_hash, check_password_hash
+	from dotenv import load_dotenv
+	import threading
+	import time
 
 *INPUT DATA*
 	*Database structure*
@@ -53,7 +58,7 @@ Assigning is required to finally form documents with list of working staff of ea
 
 *HOW DOES IT WORK*
 	app.py opens secretkey.env {SECRET_KEY='secret_key'} which is generated in secretkey_gen.py
-	
+
 
 *BACKUPS*
 	workers.db is backing up every 20 new/removed/changed records, once a week, and when app is closed (not required to run it always for us) in the 'backups' folder
