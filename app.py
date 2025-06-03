@@ -102,7 +102,7 @@ def login_required(f):
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
+    username = session.pop('username', None)  # Assign the result to a variable
     if username:
         log_action(username, 'logout', 'User logged out')
     flash('Успешный выход!')
@@ -336,7 +336,7 @@ def edit_worker():
             log_action(username, 'edit_worker', f"No changes detected for worker: {fio}")
 
     # Update worker details
-    
+
     cursor.execute('''
     UPDATE workers SET
         worker_id = ?,
