@@ -34,6 +34,16 @@ def load_users():
     return {"users": []}
 
 # Save users to JSON file
+def load_users():
+    try:
+        if os.path.exists('users.json'):
+            with open('users.json', 'r') as file:
+                return json.load(file)
+    except json.JSONDecodeError:
+        pass
+    return {"users": []}
+
+# Save users to JSON file
 def save_users(users):
     with open('users.json', 'w') as file:
         json.dump(users, file, indent=4)
@@ -43,6 +53,16 @@ users_data = load_users()
 # Global variable to track the number of changes
 change_count = 0
 last_backup_time = datetime.now()
+
+# Log file path
+LOG_FILE = 'changes.log'
+
+def log_action(username, action, details):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"{timestamp} - User: {username} - Action: {action} - Details: {details}\n"
+
+    with open(LOG_FILE, 'a') as log_file:
+        log_file.write(log_entry)
 
 @app.route('/')
 def index():
@@ -63,6 +83,7 @@ def login():
         for user in users['users']:
             if user['username'] == username and check_password_hash(user['password'], password):
                 session['username'] = username
+                log_action(username, 'login', 'User logged in')
                 flash('Успешный вход!')
                 return redirect(url_for('index'))
 
@@ -82,6 +103,8 @@ def login_required(f):
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    if username:
+        log_action(username, 'logout', 'User logged out')
     flash('Успешный выход!')
     return redirect(url_for('login'))
 
@@ -100,6 +123,7 @@ def workers():
 @login_required
 def add_worker():
     if request.method == 'POST':
+        username = session.get('username')
         worker_id = request.form['aisepo_id']
         fio = request.form['fio']
         position = request.form['position']
@@ -132,6 +156,7 @@ def add_worker():
             total_experience, specialty_experience, courses
         ))
         conn.commit()
+        log_action(username, 'add_worker', f'Added worker: {fio}')
 
         # Increment change count
         increment_change_count()
@@ -148,12 +173,18 @@ def add_worker():
 # Firing worker
 @app.route('/fire', methods=['POST'])
 def fire_worker():
+    username = session.get('username')
     data = request.get_json()
     worker_id = data['worker_id']
 
     conn = sqlite3.connect('workers.db')
     cursor = conn.cursor()
 
+    # Fetch worker details for logging
+    cursor.execute('SELECT fio FROM workers WHERE worker_id = ?', (worker_id,))
+    worker = cursor.fetchone()
+
+    fio = worker[0]
     print(f"Firing worker_id: {worker_id}")  # Debug print
     cursor.execute('DELETE FROM workers WHERE worker_id = ?', (worker_id,))
 
@@ -161,6 +192,7 @@ def fire_worker():
     cursor.execute('DELETE FROM worker_item WHERE worker_id = ?', (worker_id,))
 
     conn.commit()
+    log_action(username, 'fire_worker', f'Fired worker: {fio}')
 
     # Increment change count
     increment_change_count()
@@ -228,6 +260,7 @@ def check_worker_exists(conn, worker_id=None, fio=None, exclude_worker_id=None):
 
 @app.route('/edit_worker', methods=['POST'])
 def edit_worker():
+    username = session.get('username')
     old_worker_id = request.form['old_worker_id']
     new_worker_id = request.form['worker_id']
     fio = request.form['fio']
@@ -270,6 +303,7 @@ def edit_worker():
         total_experience, specialty_experience, courses, old_worker_id
     ))
     conn.commit()
+    log_action(username, 'edit_worker', f'Edited worker: {fio}')
 
     # Increment change count
     increment_change_count()
