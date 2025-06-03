@@ -282,6 +282,61 @@ def edit_worker():
         return jsonify({'status': 'error', 'message': message}), 400
 
     cursor = conn.cursor()
+
+    # Fetch current worker details for comparison
+    cursor.execute('SELECT * FROM workers WHERE worker_id = ?', (old_worker_id,))
+    current_worker = cursor.fetchone()
+
+    if current_worker:
+        # Prepare a list to store changes
+        changes = []
+
+        # Compare each field and log changes
+        fields = [
+            ('worker_id', new_worker_id),
+            ('fio', fio),
+            ('position', position),
+            ('education_level', education_level),
+            ('specialty', specialty),
+            ('qualification', qualification),
+            ('academic_degree', academic_degree),
+            ('academic_title', academic_title),
+            ('professional_retraining', professional_retraining),
+            ('total_experience', total_experience),
+            ('specialty_experience', specialty_experience),
+            ('courses', courses)
+        ]
+
+        # Field indices in the current_worker tuple
+        field_indices = {
+            'worker_id': 0,
+            'fio': 1,
+            'position': 2,
+            'education_level': 3,
+            'specialty': 4,
+            'qualification': 5,
+            'academic_degree': 6,
+            'academic_title': 7,
+            'professional_retraining': 8,
+            'total_experience': 9,
+            'specialty_experience': 10,
+            'courses': 11
+        }
+
+        # Check each field for changes
+        for field_name, new_value in fields:
+            old_value = current_worker[field_indices[field_name]]
+            if old_value != new_value:
+                changes.append(f"{field_name}: '{old_value}' changed to '{new_value}'")
+
+        # Log changes if any
+        if changes:
+            log_action(username, 'edit_worker', f"Edited worker: {fio}. Changes: {', '.join(changes)}")
+        else:
+            log_action(username, 'edit_worker', f"No changes detected for worker: {fio}")
+
+    # Update worker details
+    
     cursor.execute('''
     UPDATE workers SET
         worker_id = ?,
@@ -303,7 +358,6 @@ def edit_worker():
         total_experience, specialty_experience, courses, old_worker_id
     ))
     conn.commit()
-    log_action(username, 'edit_worker', f'Edited worker: {fio}')
 
     # Increment change count
     increment_change_count()

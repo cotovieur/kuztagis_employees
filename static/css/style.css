@@ -228,7 +228,7 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         width: 400px; /* Узкое окно */
         max-width: 90%; /* Автоматическое уменьшение ширины на маленьких экранах */
-        height: 80vh;
+        height: 70vh;
         overflow-y: auto;
         scrollbar-width: thin;
     }
