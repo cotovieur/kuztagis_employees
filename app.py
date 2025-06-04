@@ -326,7 +326,7 @@ def edit_worker():
         # Check each field for changes
         for field_name, new_value in fields:
             old_value = current_worker[field_indices[field_name]]
-            if old_value != new_value:
+            if str(old_value) != str(new_value):  # Ensure comparison is done correctly
                 changes.append(f"{field_name}: '{old_value}' changed to '{new_value}'")
 
         # Log changes if any
