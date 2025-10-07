@@ -3,13 +3,11 @@
 {% block content %}
 <style>
     body {
-        overflow: hidden;
         margin: 0;
     }
     .container {
         display: flex;
         flex-direction: column;
-        height: 90vh;
     }
     .spoiler-container {
         height: 50%;
@@ -72,9 +70,6 @@
         position: relative;
     }
     .copy-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
         background-color: #4CAF50;
         color: white;
         border: none;
@@ -124,6 +119,10 @@
 </style>
 
 <h1>Вставка на сайт</h1>
+<button onclick="copyPageHTML()" class="copy-button">
+    Copy Page HTML
+</button>
+
 <div class="container">
     <div class="spoiler-container">
         {% for item in items %}
@@ -221,102 +220,8 @@
         </div>
         {% endfor %}
     </div>
-    <div class="code-window">
-        <button class="copy-button" onclick="copyCode()">Copy Code</button>
-        <pre id="codeContent">
-&lt;div class="container"&gt;
-    &lt;div class="spoiler-container"&gt;
-        {% for item in items %}
-        &lt;div class="spoiler"&gt;
-            &lt;div class="spoiler-header" onclick="toggleSpoiler(this)"&gt;
-                &lt;span&gt;{{ item[1] }}&lt;/span&gt;
-                &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;&lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;&lt;/svg&gt;
-            &lt;/div&gt;
-            &lt;div class="spoiler-content"&gt;
-                {% for worker in item_worker_details[item[0]] %}
-                &lt;div class="worker-card"&gt;
-                    &lt;h3&gt;{{ worker[1] }}&lt;/h3&gt;
-                    &lt;div class="worker-grid"&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Должность:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[2] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Уровень образования:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[3] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Наименование подготовки и (или) специальности:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[4] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Квалификация:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[5] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Ученая степень:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[6] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Ученое звание:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[7] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Общий стаж работы:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[9] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                        &lt;div class="grid-row"&gt;
-                            &lt;div class="grid-label"&gt;Стаж работы по специальности:&lt;/div&gt;
-                            &lt;div class="grid-value"&gt;{{ worker[10] }}&lt;/div&gt;
-                        &lt;/div&gt;
-                    &lt;/div&gt;
-
-                    &lt;!-- Спойлер для "Повышение квалификации и профессиональная переподготовка" --&gt;
-                    &lt;div class="nested-spoiler"&gt;
-                        &lt;div class="nested-spoiler-header" onclick="toggleNestedSpoiler(this)"&gt;
-                            &lt;span&gt;Повышение квалификации и профессиональная переподготовка&lt;/span&gt;
-                            &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;
-                                &lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;
-                            &lt;/svg&gt;
-                        &lt;/div&gt;
-                        &lt;div class="nested-spoiler-content"&gt;
-                            {{ worker[8] }}
-                        &lt;/div&gt;
-                    &lt;/div&gt;
-
-                    &lt;!-- Спойлер для "Преподаваемые учебные предметы, курсы, дисциплины (модули)" --&gt;
-                    &lt;div class="nested-spoiler"&gt;
-                        &lt;div class="nested-spoiler-header" onclick="toggleNestedSpoiler(this)"&gt;
-                            &lt;span&gt;Преподаваемые учебные предметы, курсы, дисциплины (модули)&lt;/span&gt;
-                            &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;
-                                &lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;
-                            &lt;/svg&gt;
-                        &lt;/div&gt;
-                        &lt;div class="nested-spoiler-content"&gt;
-                            {{ worker[11] }}
-                        &lt;/div&gt;
-                    &lt;/div&gt;
-                &lt;/div&gt;
-                {% endfor %}
-            &lt;/div&gt;
-        &lt;/div&gt;
-        {% endfor %}
-    &lt;/div&gt;
-&lt;/div&gt;
-        </pre>
-    </div>
 </div>
 <script>
-    function copyCode() {
-        const codeContent = document.getElementById('codeContent');
-        const range = document.createRange();
-        range.selectNode(codeContent);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-        document.execCommand('copy');
-        window.getSelection().removeAllRanges();
-        alert('Code copied to clipboard!');
-    }
     function toggleSpoiler(header) {
         const spoiler = header.parentElement;
         const content = header.nextElementSibling;
@@ -341,5 +246,36 @@
             icon.classList.add('rotated');
         }
     }
+    function copyPageHTML() {
+        // 1. Копируем все стили
+        const styles = Array.from(document.querySelectorAll('style')).map(style => style.outerHTML).join('\n');
+
+        // 2. Копируем ВСЕ скрипты (включая текущий)
+        const scripts = Array.from(document.querySelectorAll('script')).map(script => script.outerHTML).join('\n');
+
+        // 3. Копируем HTML-контент блока .container
+        const container = document.querySelector('.container');
+        if (!container) {
+            alert('Блок .container не найден!');
+            return;
+        }
+        const containerHTML = container.outerHTML;
+
+        // 4. Формируем итоговый HTML
+        const fullHTML = `
+        ${styles}
+        ${containerHTML}
+        ${scripts}
+        `.trim();
+
+        // 5. Копируем в буфер обмена
+        navigator.clipboard.writeText(fullHTML)
+            .then(() => alert('HTML, CSS и JS успешно скопированы!'))
+            .catch(err => {
+                console.error('Ошибка копирования:', err);
+                alert('Не удалось скопировать. См. консоль.');
+            });
+    }
+
 </script>
 {% endblock %}
