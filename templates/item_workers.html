@@ -1,9 +1,6 @@
 {% extends "base.html" %}
-
 {% block title %}Вставка на сайт{% endblock %}
-
 {% block content %}
-
 <style>
     body {
         overflow: hidden;
@@ -79,29 +76,39 @@
     .copy-button:hover {
         background-color: #45a049;
     }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 11pt;
-        background-color: white;
-    }
-    table thead th {
-        font-weight: normal;
-        text-align: center;
+    .worker-card {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Два равных столбца */
+        gap: 10px;
         border: 1px solid #ddd;
-        padding: 8px;
-        background: #EDEDED;
-        font-size: 14px;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
     }
-    table tbody td {
-        text-align: left;
-        border: 1px solid #ddd;
-        padding: 8px;
-        font-size: 14px;
-        vertical-align: top;
+
+    .worker-card h3 {
+        grid-column: 1 / -1; /* Заголовок на всю ширину */
+        margin-top: 0;
     }
-    table tbody tr:nth-child(even) {
-        background: #F8F8F8;
+
+    .worker-grid {
+        display: contents; /* Позволяет элементам внутри grid распределяться автоматически */
+    }
+    .grid-row {
+        display: grid;
+        grid-template-columns: subgrid; /* Наследование колонок от родителя */
+    }
+    .grid-label {
+        font-weight: 300;
+        font-size: 10pt;
+        color: gray;
+        padding: 5px;
+        border-radius: 3px;
+    }
+    .grid-value {
+        padding: 5px;
+        border-radius: 3px;
     }
 </style>
 
@@ -112,50 +119,81 @@
         <div class="spoiler">
             <div class="spoiler-header" onclick="toggleSpoiler(this)">
                 <span>{{ item[1] }}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
             </div>
             <div class="spoiler-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>ФИО</th>
-                            <th>Должность</th>
-                            <th>Уровень образования</th>
-                            <th>Наименование подготовки и (или) специальности:</th>
-                            <th>Квалификация</th>
-                            <th>Ученая степень</th>
-                            <th>Ученое звание</th>
-                            <th>Повышение квалификации и профессиональная переподготовка</th>
-                            <th>Общий стаж работы</th>
-                            <th>Стаж работы по специальности</th>
-                            <th>Преподаваемые учебные предметы, курсы, дисциплины (модули):</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for worker in item_worker_details[item[0]] %}
-                        <tr>
-                            <td></td>
-                            <td>{{ worker[1] }}</td>
-                            <td>{{ worker[2] }}</td>
-                            <td>{{ worker[3] }}</td>
-                            <td>{{ worker[4] }}</td>
-                            <td>{{ worker[5] }}</td>
-                            <td>{{ worker[6] }}</td>
-                            <td>{{ worker[7] }}</td>
-                            <td>{{ worker[8] }}</td>
-                            <td>{{ worker[9] }}</td>
-                            <td>{{ worker[10] }}</td>
-                            <td>{{ worker[11] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% for worker in item_worker_details[item[0]] %}
+                <div class="worker-card">
+                    <h3>{{ worker[1] }}</h3>
+                    <div class="worker-grid">
+                        <div class="grid-row">
+                            <div class="grid-label">Должность:</div>
+                            <div class="grid-value">{{ worker[2] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Уровень образования:</div>
+                            <div class="grid-value">{{ worker[3] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Наименование подготовки и (или) специальности:</div>
+                            <div class="grid-value">{{ worker[4] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Квалификация:</div>
+                            <div class="grid-value">{{ worker[5] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Ученая степень:</div>
+                            <div class="grid-value">{{ worker[6] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Ученое звание:</div>
+                            <div class="grid-value">{{ worker[7] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Общий стаж работы:</div>
+                            <div class="grid-value">{{ worker[9] }}</div>
+                        </div>
+                        <div class="grid-row">
+                            <div class="grid-label">Стаж работы по специальности:</div>
+                            <div class="grid-value">{{ worker[10] }}</div>
+                        </div>
+                        <!-- Спойлер для "Повышение квалификации и профессиональная переподготовка" -->
+                        <div class="spoiler">
+                            <div class="spoiler-header" onclick="toggleNestedSpoiler(this)">
+                                <span>Повышение квалификации и профессиональная переподготовка</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="spoiler-content">
+                                {{ worker[8] }}
+                            </div>
+                        </div>
+
+                        <!-- Спойлер для "Преподаваемые учебные предметы, курсы, дисциплины (модули)" -->
+                        <div class="spoiler">
+                            <div class="spoiler-header" onclick="toggleNestedSpoiler(this)">
+                                <span>Преподаваемые учебные предметы, курсы, дисциплины (модули)</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="spoiler-content">
+                                {{ worker[11] }}
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                {% endfor %}
             </div>
         </div>
         {% endfor %}
     </div>
-
     <div class="code-window">
         <button class="copy-button" onclick="copyCode()">Copy Code</button>
         <pre id="codeContent">
@@ -168,42 +206,71 @@
                 &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;&lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;&lt;/svg&gt;
             &lt;/div&gt;
             &lt;div class="spoiler-content"&gt;
-                &lt;table&gt;
-                    &lt;thead&gt;
-                        &lt;tr&gt;
-                            &lt;th&gt;&lt;/th&gt;
-                            &lt;th&gt;ФИО&lt;/th&gt;
-                            &lt;th&gt;Должность&lt;/th&gt;
-                            &lt;th&gt;Уровень образования&lt;/th&gt;
-                            &lt;th&gt;Наименование подготовки и (или) специальности:&lt;/th&gt;
-                            &lt;th&gt;Квалификация&lt;/th&gt;
-                            &lt;th&gt;Ученая степень&lt;/th&gt;
-                            &lt;th&gt;Ученое звание&lt;/th&gt;
-                            &lt;th&gt;Повышение квалификации и профессиональная переподготовка&lt;/th&gt;
-                            &lt;th&gt;Общий стаж работы&lt;/th&gt;
-                            &lt;th&gt;Стаж работы по специальности&lt;/th&gt;
-                            &lt;th&gt;Преподаваемые учебные предметы, курсы, дисциплины (модули):&lt;/th&gt;
-                        &lt;/tr&gt;
-                    &lt;/thead&gt;
-                    &lt;tbody&gt;
-                        {% for worker in item_worker_details[item[0]] %}
-                        &lt;tr&gt;
-                            &lt;td&gt;&lt;/td&gt;
-                            &lt;td&gt;{{ worker[1] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[2] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[3] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[4] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[5] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[6] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[7] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[8] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[9] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[10] }}&lt;/td&gt;
-                            &lt;td&gt;{{ worker[11] }}&lt;/td&gt;
-                        &lt;/tr&gt;
-                        {% endfor %}
-                    &lt;/tbody&gt;
-                &lt;/table&gt;
+                {% for worker in item_worker_details[item[0]] %}
+                &lt;div class="worker-card"&gt;
+                    &lt;h3&gt;{{ worker[1] }}&lt;/h3&gt;
+                    &lt;div class="worker-grid"&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Должность:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[2] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Уровень образования:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[3] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Наименование подготовки и (или) специальности:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[4] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Квалификация:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[5] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Ученая степень:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[6] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Ученое звание:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[7] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Общий стаж работы:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[9] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="grid-row"&gt;
+                            &lt;div class="grid-label"&gt;Стаж работы по специальности:&lt;/div&gt;
+                            &lt;div class="grid-value"&gt;{{ worker[10] }}&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+
+                    &lt;!-- Спойлер для "Повышение квалификации и профессиональная переподготовка" --&gt;
+                    &lt;div class="nested-spoiler"&gt;
+                        &lt;div class="nested-spoiler-header" onclick="toggleNestedSpoiler(this)"&gt;
+                            &lt;span&gt;Повышение квалификации и профессиональная переподготовка&lt;/span&gt;
+                            &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;
+                                &lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;
+                            &lt;/svg&gt;
+                        &lt;/div&gt;
+                        &lt;div class="nested-spoiler-content"&gt;
+                            {{ worker[8] }}
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+
+                    &lt;!-- Спойлер для "Преподаваемые учебные предметы, курсы, дисциплины (модули)" --&gt;
+                    &lt;div class="nested-spoiler"&gt;
+                        &lt;div class="nested-spoiler-header" onclick="toggleNestedSpoiler(this)"&gt;
+                            &lt;span&gt;Преподаваемые учебные предметы, курсы, дисциплины (модули)&lt;/span&gt;
+                            &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon"&gt;
+                                &lt;polyline points="6 9 12 15 18 9"&gt;&lt;/polyline&gt;
+                            &lt;/svg&gt;
+                        &lt;/div&gt;
+                        &lt;div class="nested-spoiler-content"&gt;
+                            {{ worker[11] }}
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                {% endfor %}
             &lt;/div&gt;
         &lt;/div&gt;
         {% endfor %}
@@ -212,7 +279,6 @@
         </pre>
     </div>
 </div>
-
 <script>
     function copyCode() {
         const codeContent = document.getElementById('codeContent');
@@ -224,12 +290,22 @@
         window.getSelection().removeAllRanges();
         alert('Code copied to clipboard!');
     }
-
     function toggleSpoiler(header) {
         const spoiler = header.parentElement;
         const content = header.nextElementSibling;
         const icon = header.querySelector('.chevron-down-icon');
-
+        if (content.classList.contains('open')) {
+            content.classList.remove('open');
+            icon.classList.remove('rotated');
+        } else {
+            content.classList.add('open');
+            icon.classList.add('rotated');
+        }
+    }
+    function toggleNestedSpoiler(header) {
+        const spoiler = header.parentElement;
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.chevron-down-icon');
         if (content.classList.contains('open')) {
             content.classList.remove('open');
             icon.classList.remove('rotated');
