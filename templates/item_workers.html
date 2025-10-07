@@ -18,16 +18,24 @@
         padding: 20px;
         scrollbar-width: thin;
     }
+    .item-specialty {
+        border-color: #476DB3;
+        box-shadow: 0 4px 8px #476DB340;
+    }
+    .item-profession {
+        border-color: #8B45B9;
+        box-shadow: 0 4px 8px #8B45B940;
+    }
     .spoiler {
-        border: 1px solid #ccc;
+        border: 1px solid;
         margin: 10px 0;
         padding: 16px;
         border-radius: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     .spoiler-header {
         cursor: pointer;
         font-weight: bold;
+        color: black;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -38,6 +46,7 @@
         padding: 10px;
         margin-top: 10px;
         border-top: 1px solid #ccc;
+        color: black;
     }
     .spoiler-content.open {
         display: block;
@@ -87,6 +96,8 @@
         background-color: #f9f9f9;
     }
 
+    .worker-card .spoiler{border:1px solid #ccc}
+
     .worker-card h3 {
         grid-column: 1 / -1; /* Заголовок на всю ширину */
         margin-top: 0;
@@ -116,7 +127,7 @@
 <div class="container">
     <div class="spoiler-container">
         {% for item in items %}
-        <div class="spoiler">
+        <div class="spoiler item-{% if item[2] %}specialty{% else %}profession{% endif %}">
             <div class="spoiler-header" onclick="toggleSpoiler(this)">
                 <span>{{ item[1] }}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down-icon">
@@ -169,7 +180,15 @@
                                 </svg>
                             </div>
                             <div class="spoiler-content">
-                                {{ worker[8] }}
+                                {% if worker[8] %}
+                                <ul>
+                                    {% for line in worker[8].split('\n') if line.strip() %}
+                                        <li>{{ line.strip() }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                —
+                            {% endif %}
                             </div>
                         </div>
 
@@ -182,8 +201,16 @@
                                 </svg>
                             </div>
                             <div class="spoiler-content">
-                                {{ worker[11] }}
-                            </div>
+                            {% if worker[11] %}
+                                <ul>
+                                    {% for line in worker[11].split('\n') if line.strip() %}
+                                        <li>{{ line.strip() }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                —
+                            {% endif %}  
+                            </div>                          
                         </div>
                     </div>
 
